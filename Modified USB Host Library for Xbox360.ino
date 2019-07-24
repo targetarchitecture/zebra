@@ -36,7 +36,7 @@ int rightSpeed = 5; // HG7881_A_IA ( Motor A PWM Speed )
 // https://www.bananarobotics.com/shop/How-to-use-the-HG7881-(L9110)-Dual-Channel-Motor-Driver-Module
 int PWM_SLOW = 123;  // arbitrary slow speed PWM duty cycle
 int PWM_FAST = 1; // arbitrary fast speed PWM duty cycle
-
+ 
 //configure arm pins
 int leftArm = 9;
 int rightArm = 10;
