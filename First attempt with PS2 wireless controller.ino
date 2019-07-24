@@ -33,7 +33,7 @@ int rightEye = A4;
 //default head position
 int defaultHeadPos = 85;
 
-//arm position
+//arm position 
 int leftArmPos = 90;
 int rightArmPos = 90;
 
