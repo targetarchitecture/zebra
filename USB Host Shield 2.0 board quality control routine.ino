@@ -34,7 +34,7 @@ void setup() {
         /* SPI quick test - check revision register */
         E_Notify(PSTR("\r\nReading REVISION register... Die revision "), 0x80);
         Usb.Init(); // Initializes SPI, we don't care about the return value here
-        {
+        { 
                 uint8_t tmpbyte = Usb.regRd(rREVISION);
                 switch(tmpbyte) {
                         case( 0x01): //rev.01
