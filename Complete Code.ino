@@ -35,7 +35,7 @@ int defaultHeadPos = 85;
 //arm position
 int leftArmPos = 90;
 int rightArmPos = 90; 
-
+ 
 //joysticks x positions
 int joystickLHX = 128;
 int joystickLHY; //Define Joystick Left  Hat  Y Variable
