@@ -36,7 +36,7 @@ int oldLeftHatX = 0;
 int oldLeftHatY = 0;
 int oldRightHatX = 0;
 int oldRightHatY = 0;
- 
+  
 void loop() {
   Usb.Task();
 
