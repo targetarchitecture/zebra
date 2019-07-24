@@ -1,0 +1,68 @@
+<!-- Internet Controlled Robot using Bolt IoT platform -->
+<!-- HTML code for internet controlled robot to be uploaded on BOLT device-->
+
+
+
+
+
+<html>
+<head>
+	<title>BOLT Robot Control</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<center>
+		<b>Robot Control</b>
+
+	</center>
+
+	<!-- Button style for each button-->
+	<style> 
+	.btn-width-height{
+		width:100px;
+		height:25px; 
+	}
+
+
+	</style>
+</head>
+
+<!-- Background colour for body of the html page to be displayed-->
+<body style="font-family:Roboto;background:#0FFFFF;">
+
+
+
+	<!-- bolt.js javascript file to be included so as to use the digitalMultiWrite Functions-->
+	<script type="text/javascript" src="/serveFile?filename=bolt.js">setDebug(true);</script>	
+	<br><br>
+
+	<center>
+		<!-- Button for forward motion control-->
+		<button class="btn-width-height" type="button" onclick="digitalMultiWrite([1,0,3,2],[HIGH,LOW,HIGH,LOW]);">FORWARD
+		</button>
+		
+		<br><br><br>
+
+       <div style="margin-left:auto;margin-right:auto">
+
+       	<!-- Button for Left motion-->
+			<button class="btn-width-height" type="button" onclick="digitalMultiWrite([1,0,3,2],[LOW,LOW,HIGH,LOW]);">LEFT
+		 </button>
+			
+			<!-- Button for Stop-->
+	
+		<button class="btn-width-height" type="button" onclick="digitalMultiWrite([1,0,3,2],[LOW,LOW,LOW,LOW]);"> STOP
+		</button>
+	
+		<!-- Button for Right motion control-->
+           <button class="btn-width-height" type="button" onclick="digitalMultiWrite([1,0,3,2],[HIGH,LOW,LOW,LOW]);">RIGHT
+			</button>
+	</div>	
+
+	<br><br>			
+		<!-- Button for reverse motion control-->
+	<button class="btn-width-height" type="button" onclick="digitalMultiWrite([1,0,3,2],[LOW,HIGH,LOW,HIGH]);">REVERSE 
+		</button>
+	</center>
+
+
+</body>
+</html>
