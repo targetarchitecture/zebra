@@ -58,15 +58,23 @@ Servo headServo;     // create servo object to control the head servo
 Servo leftArmServo;  // create servo object to control the arm
 Servo rightArmServo; // create servo object to control the arm servo
 
-int ledState = LOW; // ledState used to set the LED
+enum eyeStates
+{
+  off,
+  winking,
+  on
+};
+
+eyeStates eyes = off;
+eyeStates nextEyes = off;
 
 // Generally, you should use "unsigned long" for variables that hold time
 // The value will quickly become too large for an int to store
-unsigned long previousMillis = 0; // will store last time LED was updated
+unsigned long winkMillis = 0; // will store last time wink LED was updated
 
-const long blinkSpeed = 1000; // interval at which to blink (milliseconds)
+const int winkSpeed = 1000; // interval at which to blink (milliseconds)
 
-bool serialPrint = false;
+bool serialPrint = true;
 
 //declare methdos
 void armPosition();
@@ -77,14 +85,12 @@ void moveLeft();
 void print(String val);
 void stopMotors();
 void getButtonClicks();
-void winkEye();
+void setEyes();
 void headJoystick();
 
 void setup()
 {
-  Serial.begin(57600);
-
-  //while (!Serial); // Wait for serial port to connect - used on Leonardo, Teensy and other boards with built-in USB CDC serial connection
+  Serial.begin(57600); //lower speed due to cable length
 
   // Configure digital pins for motor
   pinMode(leftDirection, OUTPUT);
@@ -158,42 +164,57 @@ void setup()
 
 void loop()
 {
-
   ps2x.read_gamepad(false, false); //read controller
   //ps2x.reconfig_gamepad(); //https://stackoverflow.com/questions/46493222/why-arduino-needs-to-be-restarted-after-ps2-controller-communication-in-arduino
 
   delay(50);
 
-  //movementJoystick();
-
   headJoystick();
 
   getButtonClicks();
 
-  winkEye();
+  setEyes();
 
   armPosition();
-
-  //print("Head Position on Analog(PSS_RX) @" + String(ps2x.Analog(PSS_RX)));
-  //print("Head Position on Analog(PSS_LX) @" + String(ps2x.Analog(PSS_LX)));
 }
 
-void winkEye()
+void setEyes()
 {
-
-  if (previousMillis > 0)
+  if (nextEyes != eyes)
   {
-
-    unsigned long currentMillis = millis();
-
-    if (currentMillis - previousMillis >= blinkSpeed)
+    //only wink if eyes are turned off
+    if (nextEyes == winking && eyes == off)
     {
-
-      // reset
-      previousMillis = 0;
-
-      digitalWrite(rightEye, LOW);
+      //record time of blink & set LED to on
+      winkMillis = millis();
     }
+
+    eyes = nextEyes;
+  }
+
+  //set LEDs based on state
+  if (eyes == winking)
+  {
+    digitalWrite(rightEye, HIGH);
+    digitalWrite(leftEye, LOW);
+
+    if (millis() - winkMillis >= winkSpeed)
+    {
+      //wink time over
+      nextEyes = off;
+    }
+  }
+
+  if (eyes == on)
+  {
+    digitalWrite(rightEye, HIGH);
+    digitalWrite(leftEye, HIGH);
+  }
+
+  if (eyes == off)
+  {
+    digitalWrite(rightEye, LOW);
+    digitalWrite(leftEye, LOW);
   }
 }
 
@@ -212,14 +233,7 @@ void getButtonClicks()
   {
     print("CIRCLE pressed");
 
-    //only blink if LEDs are off
-    if (ledState == LOW)
-    {
-      //record time of blink & set LED to on
-      previousMillis = millis();
-
-      digitalWrite(rightEye, HIGH);
-    }
+    nextEyes = winking;
   }
 
   stopMotors();
@@ -268,19 +282,14 @@ void getButtonClicks()
   {
     print("CROSS pressed");
 
-    // if the LED is off turn it on and vice-versa:
-    if (ledState == LOW)
+    if (eyes == off)
     {
-      ledState = HIGH;
+      nextEyes = on;
     }
     else
     {
-      ledState = LOW;
+      nextEyes = off;
     }
-
-    // set the LED with the ledState of the variable:
-    digitalWrite(leftEye, ledState);
-    digitalWrite(rightEye, ledState);
   }
 }
 
@@ -459,34 +468,25 @@ unsigned long previousServoMillis = millis();
 
 void headJoystick()
 {
-
-  //int newJoystickX = map(ps2x.Analog(PSS_LX) , 0, 255, 154, 30);
-
   int newJoystickX = ps2x.Analog(PSS_LX);
 
-  //newJoystickX = constrain(newJoystickX, 30, 154);
-
-  //newJoystickX = 128 , servo position = 85
-  //newJoystickX = 255 , servo position = 154
-  //newJoystickX = 0 , servo position = 30
-
   int newHeadPos = defaultHeadPos;
+  int deadstick = 10;
 
-  if (newJoystickX > 128)
+  if (newJoystickX > 128 + deadstick)
   {
     newHeadPos = 30;
   }
 
-  if (newJoystickX < 128)
+  if (newJoystickX < 128 - deadstick)
   {
     newHeadPos = 154;
   }
 
-  print("Head Position on Analog(PSS_RX) @" + String(newJoystickX));
+  print("Head Position on Analog(PSS_RX) @" + String(newJoystickX) + " new position @" + String(newHeadPos));
 
   if (newHeadPos != HeadPos)
   {
-
     unsigned long currentMillis = millis();
 
     // its time for another move
@@ -516,7 +516,6 @@ void armPosition()
 
   if (ps2x.Button(PSB_L2))
   {
-
     leftArmPos = constrain(leftArmPos + armSpeed, 0, 90);
 
     print("L1 pressed @" + String(leftArmPos));
@@ -526,7 +525,6 @@ void armPosition()
 
   if (ps2x.Button(PSB_L1))
   {
-
     leftArmPos = constrain(leftArmPos - armSpeed, 0, 90);
 
     print("L2 pressed @" + String(leftArmPos));
